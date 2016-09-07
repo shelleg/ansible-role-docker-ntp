@@ -1,0 +1,14 @@
+---
+# defaults file for docker-ntp
+ntp_service_name: ntp
+ntp_udp_port: 123
+ntp_primary_server: 0.asia.pool.ntp.org
+ntp_servers:
+- 1.asia.pool.ntp.org
+- 2.asia.pool.ntp.org
+- 3.asia.pool.ntp.org
+
+ntp_container_prefix: "shelleg/ntpd-{{ shelleg.os | default('ubuntu') }}"
+ntp_container_version: latest
+ntp_container_name: "{{ ntp_container_prefix }}:{{ ntp_container_version }}"
+ntp_conf_file: /etc/ntpd.conf

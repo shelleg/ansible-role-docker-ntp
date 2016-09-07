@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+# Do not edit manually unless you know what your doing ;)
+
+# ntp server list
+server {{ ntp_primary_server }} iburst
+{% for server in ntp_servers  %}
+server {{ server }}
+{% endfor %}
+
+# fallbck to local host when no internet is avail ...
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10

@@ -1,0 +1,21 @@
+---
+# tasks file for docker-ntp
+
+- name: "Generate ntp conf file"
+  template:
+    src: "ntpd.conf.j2"
+    dest: "/etc/ntpd.conf"
+    owner: "root"
+    group: "root"
+    mode: 0744
+
+- name: "Run Docker ntp container ..."
+  docker_container:
+    name: "{{ ntp_service_name }}"
+    image: "{{ ntp_container_name }}"
+    state: started
+    restart: yes
+    ports:
+      - "0.0.0.0:{{ ntp_udp_port }}:{{ ntp_udp_port }}"
+    volumes:
+      - /etc/ntpd.conf:/etc/ntpd.conf:ro
