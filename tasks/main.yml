@@ -1,21 +1,27 @@
 ---
 # tasks file for docker-ntp
 
+- name: "Install ntp pkg"
+  apt: name=ntp state=latest update_cache=true cache_valid_time=86400
+  when: ansible_os_family == 'Debian'
+
+- name: "Define var if client"
+  set_fact:
+    ntp_conf_file: ntp-server.conf.j2
+  when: (inventory_hostname == "{{ shelleg_hosts.infra[0].cname }}")
+
+- name: "Define var if server"
+  set_fact:
+    ntp_conf_file: ntp-client.conf.j2
+  when: (inventory_hostname != "{{ shelleg_hosts.infra[0].cname }}")
+
 - name: "Generate ntp conf file"
   template:
-    src: "ntpd.conf.j2"
+    src: "{{ ntp_conf_file }}"
     dest: "/etc/ntpd.conf"
     owner: "root"
     group: "root"
     mode: 0744
 
-- name: "Run Docker ntp container ..."
-  docker_container:
-    name: "{{ ntp_service_name }}"
-    image: "{{ ntp_container_name }}"
-    state: started
-    restart: yes
-    ports:
-      - "0.0.0.0:{{ ntp_udp_port }}:{{ ntp_udp_port }}"
-    volumes:
-      - /etc/ntpd.conf:/etc/ntpd.conf:ro
+- name: "Enable & start ntp service"
+  service: name={{ ntp_service_name }} state=started enabled=yes

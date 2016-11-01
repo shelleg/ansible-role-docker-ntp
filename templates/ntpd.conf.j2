@@ -1,6 +1,12 @@
 # {{ ansible_managed }}
 # Do not edit manually unless you know what your doing ;)
 
+# Permit time synchronization with our time source, but do not
+# permit the source to query or modify the service on this system.
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.0.0.1
+
 # ntp server list
 server {{ ntp_primary_server }} iburst
 {% for server in ntp_servers  %}

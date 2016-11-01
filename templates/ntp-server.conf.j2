@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+# Do not edit manually unless you know what your doing ;)
+
+driftfile {{ ntp_config_driftfile }}
+statsdir {{ ntp_config_statsdir }}
+
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+# "upstream" NTP servers
+
+server {{ ntp_primary_upstream_server }} iburst
+{% for server in ntp_upstream_servers  %}
+server {{ server }}
+{% endfor %}
+
+# fallbck to local host when no internet is avail ...
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10
+
+restrict -4 default kod notrap nomodify
+restrict -6 default kod notrap nomodify
+
+# Allow local modifications
+restrict 127.0.0.1
+restrict ::1

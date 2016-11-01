@@ -1,2 +1,11 @@
 ---
 # handlers file for docker-ntp
+
+- name: "restart ntp"
+  service: name={{ ntp_service_name }} state=restarted
+
+- name: "start ntp"
+  service: name={{ ntp_service_name }} state=started
+
+- name: "stop ntp"
+  service: name={{ ntp_service_name }} state=stopped

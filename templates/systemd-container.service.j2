@@ -1,0 +1,28 @@
+[Unit]
+Description={{ ntp_description }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/usr/bin/docker stop {{ ntp_service_name }}
+ExecStartPre=-/usr/bin/docker rm {{ ntp_service_name }}
+ExecStart=/usr/bin/docker run --rm -t \
+{% for port in  ntp_ports %}
+    -p {{ port }} \
+{% endfor %}
+{% for volume in ntp_volumes %}
+    -v {{ volume }} \
+{% endfor %}
+{% for option in ntp_extra_opts %}
+    {{ option }} \
+{% endfor %}
+    --name {{ ntp_service_name }} {{ ntp_container_image }}
+ExecStop=-/usr/bin/docker stop -t 3 {{ ntp_service_name }}
+ExecStop=-/usr/bin/docker rm {{ ntp_service_name }}
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
